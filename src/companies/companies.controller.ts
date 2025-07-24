@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Request } from 'express';
+import { User } from 'src/decorator/customize';
+import { IUser } from 'src/users/users.interface';
 
 @Controller('companies')
 export class CompaniesController {
@@ -10,8 +13,8 @@ export class CompaniesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.companiesService.create(createCompanyDto);
+  create(@Body() createCompanyDto: CreateCompanyDto, @User() user: IUser) {
+    return this.companiesService.create(createCompanyDto, user);
   }
 
   @Get()
