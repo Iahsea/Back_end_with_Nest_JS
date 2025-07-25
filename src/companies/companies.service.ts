@@ -6,6 +6,7 @@ import { Company, CompanyDocument } from './schemas/companies.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import mongoose from 'mongoose';
+import { buildFilter, buildSort } from 'src/common/utils/query.utils';
 
 @Injectable()
 export class CompaniesService {
@@ -24,9 +25,40 @@ export class CompaniesService {
     })
   }
 
-  findAll() {
-    return `This action returns all companies`;
+  async findAll(query: any) {
+    const filter = buildFilter(query);
+    const sort = buildSort(query);
+
+    const page = parseInt(query.page) || 1;
+    const limit = parseInt(query.limit) || 10;
+
+    const offset = (page - 1) * limit;
+
+    let defaultLimit = +limit ? +limit : 10
+
+    const totalItems = (await this.companyModel.find(filter)).length
+    const totalPages = Math.ceil(totalItems / defaultLimit)
+
+
+    const result = await this.companyModel
+      .find(filter)
+      .skip(offset)
+      .limit(limit)
+      .sort(sort)
+      .populate('createdBy')
+      .exec();
+
+    return {
+      meta: {
+        currentPage: page,
+        pageSize: limit,
+        totalPages: totalPages,
+        totalItems: totalItems
+      },
+      result
+    }
   }
+
 
   findOne(id: number) {
     return `This action returns a #${id} company`;
