@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Company, CompanyDocument } from './schemas/companies.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class CompaniesService {
@@ -31,8 +32,8 @@ export class CompaniesService {
     return `This action returns a #${id} company`;
   }
 
-  update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
-    return this.companyModel.updateOne(
+  async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
+    return await this.companyModel.updateOne(
       { _id: id },
       {
         ...updateCompanyDto,
@@ -44,7 +45,18 @@ export class CompaniesService {
     );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: string, user: IUser) {
+    await this.companyModel.updateMany(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
+    return this.companyModel.softDelete(
+      { _id: id }
+    )
   }
 }

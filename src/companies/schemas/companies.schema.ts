@@ -30,6 +30,12 @@ export class Company {
         email: string;
     };
 
+    @Prop({ type: Object })
+    deletedBy: {
+        _id: mongoose.Schema.Types.ObjectId;
+        email: string;
+    };
+
     @Prop()
     updatedAt: Date;
 
