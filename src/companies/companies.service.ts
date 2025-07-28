@@ -78,7 +78,7 @@ export class CompaniesService {
   }
 
   async remove(id: string, user: IUser) {
-    await this.companyModel.updateMany(
+    await this.companyModel.updateOne(
       { _id: id },
       {
         deletedBy: {

@@ -30,17 +30,19 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @ResponseMessage("Update a User")
   @Patch()
-  update(
+  async update(
     @Body() updateUserDto: UpdateUserDto,
     @User() user: IUser
   ) {
-    let updatedUser = this.usersService.update(updateUserDto, user);
+    let updatedUser = await this.usersService.update(updateUserDto, user);
     return updatedUser;
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  @ResponseMessage("Delete a User")
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.usersService.remove(id, user);
   }
 }
