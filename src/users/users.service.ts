@@ -7,6 +7,7 @@ import mongoose, { Model } from 'mongoose';
 import { genSaltSync, hashSync, compareSync } from "bcryptjs";
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from './users.interface';
+import { buildFilter, buildSort } from 'src/common/utils/query.utils';
 
 
 @Injectable()
@@ -70,8 +71,41 @@ export class UsersService {
     return newRegister;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(query: any) {
+    console.log(">>>>> check query", query);
+
+    const filter = buildFilter(query);
+    const sort = buildSort(query);
+
+    const page = parseInt(query.page) || 1;
+    const limit = parseInt(query.limit) || 10;
+
+    const offset = (page - 1) * limit;
+
+    let defaultLimit = +limit ? +limit : 10
+
+    const totalItems = (await this.userModel.find(filter)).length
+    const totalPages = Math.ceil(totalItems / defaultLimit)
+
+
+    const result = await this.userModel
+      .find(filter)
+      .skip(offset)
+      .limit(limit)
+      .sort(sort)
+      .select('-password')
+      // .populate('createdBy')
+      .exec();
+
+    return {
+      meta: {
+        currentPage: page,
+        pageSize: limit,
+        totalPages: totalPages,
+        totalItems: totalItems
+      },
+      result
+    }
   }
 
   async findOne(id: string) {

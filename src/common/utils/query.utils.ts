@@ -13,6 +13,22 @@ export function buildFilter(query: any) {
     filter.address = { $regex: query.address, $options: 'i' };
   }
 
+  if (query.age) {
+    filter.address = { $regex: query.age, $options: 'i' };
+  }
+
+  if (query.gender) {
+    filter.address = { $regex: query.gender, $options: 'i' };
+  }
+
+  if (query.company) {
+    filter.address = { $regex: query.company, $options: 'i' };
+  }
+
+  if (query.role) {
+    filter.address = { $regex: query.role, $options: 'i' };
+  }
+
   return filter;
 }
 
