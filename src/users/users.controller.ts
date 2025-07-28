@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from './users.interface';
 
 
@@ -25,9 +25,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Public()
+  @ResponseMessage("Fetch user by id")
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const foundUser = this.usersService.findOne(id);
+    return foundUser;
   }
 
   @ResponseMessage("Update a User")

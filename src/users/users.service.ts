@@ -74,13 +74,13 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id))
       return `not found user`
 
-    return this.userModel.findOne({
+    return await this.userModel.findOne({
       _id: id
-    });
+    }).select("-password")
   }
 
   findOneByUsername(username: string) {
