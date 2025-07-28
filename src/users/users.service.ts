@@ -93,8 +93,19 @@ export class UsersService {
     return compareSync(password, hash);
   }
 
-  async update(updateUserDto: UpdateUserDto) {
-    return await this.userModel.updateOne({ _id: updateUserDto._id }, { ...updateUserDto });
+  async update(updateUserDto: UpdateUserDto, user: IUser) {
+    console.log(">>>>> check update user", updateUserDto);
+
+    const updated = await this.userModel.updateOne(
+      { _id: updateUserDto._id },
+      {
+        ...updateUserDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      });
+    return updated;
   }
 
   async remove(id: string) {
