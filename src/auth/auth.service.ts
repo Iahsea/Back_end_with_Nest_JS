@@ -6,12 +6,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
+import ms from 'ms';
 
 @Injectable()
 export class AuthService {
     constructor(
         private usersService: UsersService,
         private jwtService: JwtService,
+        private configService: ConfigService,
         @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>
     ) { }
 
@@ -26,7 +30,7 @@ export class AuthService {
         return null;
     }
 
-    async login(user: IUser) {
+    async login(user: IUser, response: Response) {
         const { _id, name, email, role } = user;
         const payload = {
             sub: "token login",
@@ -35,13 +39,27 @@ export class AuthService {
             name,
             email,
             role
-        }
+        };
+
+        const refresh_token = this.createRefreshToken(payload)
+
+        //update user with refresh token
+        await this.usersService.updateUserToken(refresh_token, _id);
+
+        //set refresh_token as cookies
+        response.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            maxAge: ms(this.configService.get<string>('JWT_REFRESH_EXPIRE') as ms.StringValue),
+        })
+
         return {
             access_token: this.jwtService.sign(payload),
-            _id,
-            name,
-            email,
-            role
+            user: {
+                _id,
+                name,
+                email,
+                role
+            }
         };
     }
 
@@ -52,21 +70,16 @@ export class AuthService {
             _id: newUser?._id,
             createdAt: newUser?.createdAt
         }
-        // console.log(">>>>> check user register", registerUserDto);
-        // const { name, email, password, age, gender, address } = registerUserDto;
-        // const existUser = await this.usersService.findOneByUsername(email);
-        // if (existUser) {
-        //     return 'User already exist';
-        // }
-        // const hashPassword = this.usersService.getHashPassword(password)
-        // const data = await this.userModel.create({
-        //     ...registerUserDto,
-        //     password: hashPassword,
-        //     role: 'USER'
-        // });
-        // return {
-        //     _id: data._id,
-        //     createdAt: data.createdAt
-        // }
+    }
+
+    createRefreshToken = (payload) => {
+        const refresh_token = this.jwtService.sign(
+            payload,
+            {
+                secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+                expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRE')
+            }
+        );
+        return refresh_token;
     }
 }
