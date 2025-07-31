@@ -25,13 +25,15 @@ export class JobsController {
     return this.jobsService.findOne(+id);
   }
 
+  @ResponseMessage("Update a job")
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateJobDto: UpdateJobDto, @User() user: IUser) {
     return await this.jobsService.update(id, updateJobDto, user);
   }
 
+  @ResponseMessage("Delete a job")
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.jobsService.remove(+id);
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.jobsService.remove(id, user);
   }
 }

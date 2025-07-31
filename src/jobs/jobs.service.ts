@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Job, JobDocument } from './schemas/job.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class JobsService {
@@ -63,7 +64,21 @@ export class JobsService {
     return upload;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} job`;
+  async remove(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return `not found user`
+
+    await this.jobModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
+    return this.jobModel.softDelete(
+      { _id: id }
+    )
   }
 }
