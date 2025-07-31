@@ -166,4 +166,8 @@ export class UsersService {
       { refreshToken }
     )
   }
+
+  findUserByRefreshToken = async (refreshToken: string) => {
+    return await this.userModel.findOne({ refreshToken })
+  }
 }
