@@ -50,4 +50,13 @@ export class AuthController {
         const refreshToken = request.cookies["refresh_token"];
         return this.authService.processNewToken(refreshToken, response)
     }
+
+    @ResponseMessage("Logout User")
+    @Post('/logout')
+    async logout(
+        @Res({ passthrough: true }) response: Response,
+        @User() user: IUser
+    ) {
+        return this.authService.handleLogout(response, user);
+    }
 }

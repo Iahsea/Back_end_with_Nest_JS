@@ -7,7 +7,7 @@ import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { response, Response } from 'express';
 import ms, { StringValue } from 'ms';
 
 @Injectable()
@@ -134,5 +134,11 @@ export class AuthService {
         } catch (error) {
             throw new BadRequestException(`Refresh token không hợp lệ. Vui lòng login.`)
         }
+    }
+
+    handleLogout = async (response: Response, user: IUser) => {
+        await this.usersService.updateUserToken("", user._id);
+        response.clearCookie("refresh_token");
+        return 'ok';
     }
 }
