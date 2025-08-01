@@ -43,8 +43,11 @@ export class JobsService {
     return `This action returns all jobs`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} job`;
+  async findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return `not found job`
+
+    return await this.jobModel.findById(id)
   }
 
   async update(_id: string, updateJobDto: UpdateJobDto, user: IUser) {
