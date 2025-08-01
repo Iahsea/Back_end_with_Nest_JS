@@ -3,6 +3,7 @@ import { FilesService } from './files.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResponseMessage } from 'src/decorator/customize';
 
 @Controller('files')
 export class FilesController {
@@ -10,13 +11,13 @@ export class FilesController {
 
 
   @Post('upload')
+  @ResponseMessage("Upload Single File")
   @UseInterceptors(FileInterceptor('file'))
   uploadFile(@UploadedFile(
     new ParseFilePipeBuilder()
-      .addFileTypeValidator({
-        // fileType: /^.*/i,
-        fileType: /^(image\/jpeg|image\/png|image\/gif|text\/plain|application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document)$/i,
-      })
+      // .addFileTypeValidator({
+      //   fileType: /^(image\/.*|application\/pdf|text\/plain)$/i,
+      // })
       .addMaxSizeValidator({
         maxSize: 1024 * 1000
       })
@@ -24,7 +25,9 @@ export class FilesController {
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
       }),
   ) file: Express.Multer.File) {
-    console.log(file);
+    return {
+      fileName: file.filename
+    }
   }
 
   @Post()

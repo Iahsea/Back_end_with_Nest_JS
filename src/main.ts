@@ -5,15 +5,20 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './common/core/transform.interceptor';
 import cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 require('dotenv').config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
+
+  app.useStaticAssets(join(__dirname, '..', 'public')); //js, css, images
+  app.setBaseViewsDir(join(__dirname, '..', 'views')); //view
 
   //config cors
   app.enableCors(
