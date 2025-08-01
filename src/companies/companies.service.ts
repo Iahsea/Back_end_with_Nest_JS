@@ -29,8 +29,8 @@ export class CompaniesService {
     const filter = buildFilter(query);
     const sort = buildSort(query);
 
-    const page = parseInt(query.current) || 1;
-    const limit = parseInt(query.pageSize) || 10;
+    const page = parseInt(query.current);
+    const limit = parseInt(query.pageSize);
 
     const offset = (page - 1) * limit;
 

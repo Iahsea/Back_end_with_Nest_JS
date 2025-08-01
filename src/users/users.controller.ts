@@ -22,7 +22,7 @@ export class UsersController {
 
   @Get()
   @ResponseMessage("Fetch user with paginate")
-  findAll(@Query() queryString: any,) {
+  findAll(@Query() queryString: any) {
     return this.usersService.findAll(queryString);
   }
 

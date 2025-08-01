@@ -6,6 +6,7 @@ import { Job, JobDocument } from './schemas/job.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import mongoose from 'mongoose';
+import { buildFilter, buildSort } from 'src/common/utils/query.utils';
 
 @Injectable()
 export class JobsService {
@@ -39,8 +40,39 @@ export class JobsService {
     }
   }
 
-  findAll() {
-    return `This action returns all jobs`;
+  async findAll(query: any) {
+    console.log("check query", query);
+
+    const filter = buildFilter(query);
+    const sort = buildSort(query);
+
+    const page = parseInt(query.current);
+    const limit = parseInt(query.pageSize);
+
+    const offset = (page - 1) * limit;
+
+    let defaultLimit = +limit ? +limit : 10
+
+    const totalItems = (await this.jobModel.find(filter)).length
+    const totalPages = Math.ceil(totalItems / defaultLimit)
+
+    const result = await this.jobModel
+      .find(filter)
+      .skip(offset)
+      .limit(limit)
+      .sort(sort)
+      // .populate('createdBy')
+      .exec();
+
+    return {
+      meta: {
+        currentPage: page,
+        pageSize: limit,
+        totalPages: totalPages,
+        totalItems: totalItems
+      },
+      result
+    }
   }
 
   async findOne(id: string) {
