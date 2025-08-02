@@ -83,8 +83,32 @@ export class ResumesService {
     return await this.resumeModel.findById(id)
   }
 
-  update(id: number, updateResumeDto: UpdateResumeDto) {
-    return `This action updates a #${id} resume`;
+  async update(_id: string, status: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      throw new BadRequestException("not found resume")
+    }
+
+    const updated = await this.resumeModel.updateOne(
+      { _id },
+      {
+        status,
+        updatedBy: {
+          _id: user._id,
+          email: user.email
+        },
+        $push: {
+          history: {
+            status: status,
+            updatedAt: new Date,
+            updatedBy: {
+              _id: user._id,
+              email: user.email
+            }
+          }
+        }
+      }
+    )
+    return updated;
   }
 
   remove(id: number) {
