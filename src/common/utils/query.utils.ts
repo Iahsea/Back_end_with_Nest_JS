@@ -9,12 +9,19 @@ export function buildFilter(query: any) {
     filter.skills = { $regex: query.skills, $options: 'i' };
   }
 
+  if (query.location) {
+    filter.location = { $regex: query.location, $options: 'i' };
+  }
+
   if (query.email) {
     filter.email = { $regex: query.email, $options: 'i' };
   }
 
   if (query.level) {
-    filter.level = { $regex: query.level, $options: 'i' };
+    const levels = query.level.split(',').map((l: string) => ({
+      level: { $regex: l, $options: 'i' }
+    }));
+    filter.$or = levels;
   }
 
   if (query.address) {

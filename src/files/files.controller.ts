@@ -12,11 +12,11 @@ export class FilesController {
 
   @Post('upload')
   @ResponseMessage("Upload Single File")
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('fileUpload'))
   uploadFile(@UploadedFile(
     new ParseFilePipeBuilder()
       // .addFileTypeValidator({
-      //   fileType: /^(image\/.*|application\/pdf|text\/plain)$/i,
+      //   fileType: /^(jpg|jpeg|image\/jpeg|png|image\/png|gif|txt|pdf|application\/pdf|doc|docx|text\/plain)$/i,
       // })
       .addMaxSizeValidator({
         maxSize: 1024 * 1000

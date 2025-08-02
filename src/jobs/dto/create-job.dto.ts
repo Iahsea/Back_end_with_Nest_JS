@@ -8,6 +8,9 @@ class Company {
 
     @IsNotEmpty()
     name: string;
+
+    @IsNotEmpty()
+    logo: string;
 }
 
 export class CreateJobDto {
@@ -19,9 +22,10 @@ export class CreateJobDto {
     @IsString({ each: true, message: 'Mỗi skill phải là chuỗi' })
     skills: string[];
 
-    @IsOptional()
+    @IsNotEmpty({ message: 'Location không được để trống', })
     location: string;
 
+    @IsNotEmpty({ message: 'Salary không được để trống', })
     salary: number;
 
     @IsNotEmpty({ message: 'Quantity không được để trống', })
