@@ -15,6 +15,12 @@ export class ResumesController {
     return this.resumesService.create(createUserCvDto, user);
   }
 
+  @Post('by-user')
+  @ResponseMessage('Get Resumes by User')
+  findResumeByUser(@User() user: IUser) {
+    return this.resumesService.handleFindResumeByUser(user);
+  }
+
   @Get()
   @ResponseMessage('Fetch all resumes with paginate')
   findAll(@Query() queryString: any) {
@@ -34,7 +40,8 @@ export class ResumesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.resumesService.remove(+id);
+  @ResponseMessage('Delete a resume by id')
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.resumesService.remove(id, user);
   }
 }

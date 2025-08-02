@@ -83,6 +83,11 @@ export class ResumesService {
     return await this.resumeModel.findById(id)
   }
 
+  async handleFindResumeByUser(user: IUser) {
+    const result = await this.resumeModel.find({ userId: user._id });
+    return result;
+  }
+
   async update(_id: string, status: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(_id)) {
       throw new BadRequestException("not found resume")
@@ -111,7 +116,21 @@ export class ResumesService {
     return updated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} resume`;
+  async remove(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return `not found resume`
+
+    await this.resumeModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
+    return this.resumeModel.softDelete(
+      { _id: id }
+    )
   }
 }
