@@ -43,8 +43,6 @@ export class JobsService {
   }
 
   async findAll(query: any) {
-    console.log("check query", query);
-
     const filter = buildFilter(query);
     const sort = buildSort(query);
 
