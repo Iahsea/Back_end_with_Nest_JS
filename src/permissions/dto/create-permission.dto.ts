@@ -1,5 +1,4 @@
 import { IsNotEmpty } from "class-validator";
-import mongoose from "mongoose";
 
 export class CreatePermissionDto {
     @IsNotEmpty({ message: 'name không được để trống' })
