@@ -6,7 +6,7 @@ import { Company, CompanyDocument } from './schemas/companies.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import mongoose from 'mongoose';
-import { buildFilter, buildSort } from 'src/common/utils/query.utils';
+import { buildQueryParams } from 'src/common/utils/query.utils';
 
 @Injectable()
 export class CompaniesService {
@@ -26,8 +26,7 @@ export class CompaniesService {
   }
 
   async findAll(query: any) {
-    const filter = buildFilter(query);
-    const sort = buildSort(query);
+    const { filter, sort, populates } = buildQueryParams(query);
 
     const page = parseInt(query.current);
     const limit = parseInt(query.pageSize);

@@ -1,6 +1,7 @@
-export function buildFilter(query: any) {
+export function buildQueryParams(query: any) {
   const filter: any = {};
 
+  // ====== FILTER ======
   if (query.name) {
     filter.name = { $regex: query.name, $options: 'i' };
   }
@@ -29,11 +30,11 @@ export function buildFilter(query: any) {
   }
 
   if (query.age) {
-    filter.age = query.age; // nếu age là số thì không cần regex
+    filter.age = query.age;
   }
 
   if (query.salary) {
-    filter.salary = query.salary; // nếu age là số thì không cần regex
+    filter.salary = query.salary;
   }
 
   if (query.gender) {
@@ -41,21 +42,15 @@ export function buildFilter(query: any) {
   }
 
   if (query.company) {
-    filter.company.name = { $regex: query.company.name, $options: 'i' };
+    filter.company = { name: { $regex: query.company.name, $options: 'i' } };
   }
 
   if (query.role) {
     filter.role = { $regex: query.role, $options: 'i' };
   }
 
-  return filter;
-}
-
-
-
-export function buildSort(query: any) {
+  // ====== SORT ======
   const sort: any = {};
-
   if (query.sortBy) {
     const fields = query.sortBy.split(',');
     const orders = query.order?.split(',') || [];
@@ -65,6 +60,16 @@ export function buildSort(query: any) {
     });
   }
 
-  return sort;
-}
+  // ====== POPULATE ======
+  const populates = query.populate
+    ? query.populate.split(',').map((p: string) => p.trim())
+    : [];
 
+
+  // ====== FIELDS ======
+  const fieldsSelect = query.fields
+    ? query.fields.split(',').join(' ')
+    : '';
+
+  return { filter, sort, populates, fieldsSelect };
+}

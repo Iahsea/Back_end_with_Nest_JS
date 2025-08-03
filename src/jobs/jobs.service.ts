@@ -6,7 +6,7 @@ import { Job, JobDocument } from './schemas/job.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import mongoose from 'mongoose';
-import { buildFilter, buildSort } from 'src/common/utils/query.utils';
+import { buildQueryParams } from 'src/common/utils/query.utils';
 
 @Injectable()
 export class JobsService {
@@ -43,8 +43,7 @@ export class JobsService {
   }
 
   async findAll(query: any) {
-    const filter = buildFilter(query);
-    const sort = buildSort(query);
+    const { filter, sort, populates } = buildQueryParams(query);
 
     const page = parseInt(query.current);
     const limit = parseInt(query.pageSize);

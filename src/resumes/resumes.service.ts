@@ -5,8 +5,8 @@ import { IUser } from 'src/users/users.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Resume, ResumeDocument } from './schemas/resume.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { buildFilter, buildSort } from 'src/common/utils/query.utils';
 import mongoose from 'mongoose';
+import { buildQueryParams } from 'src/common/utils/query.utils';
 
 @Injectable()
 export class ResumesService {
@@ -43,8 +43,7 @@ export class ResumesService {
   }
 
   async findAll(query: any) {
-    const filter = buildFilter(query);
-    const sort = buildSort(query);
+    const { filter, sort, populates } = buildQueryParams(query);
 
     const page = parseInt(query.current);
     const limit = parseInt(query.pageSize);
@@ -61,7 +60,7 @@ export class ResumesService {
       .skip(offset)
       .limit(limit)
       .sort(sort)
-      // .populate('createdBy')
+      .populate(populates)
       .exec();
 
     return {

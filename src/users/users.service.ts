@@ -7,7 +7,7 @@ import mongoose, { Model } from 'mongoose';
 import { genSaltSync, hashSync, compareSync } from "bcryptjs";
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from './users.interface';
-import { buildFilter, buildSort } from 'src/common/utils/query.utils';
+import { buildQueryParams } from 'src/common/utils/query.utils';
 
 
 @Injectable()
@@ -72,8 +72,7 @@ export class UsersService {
   }
 
   async findAll(query: any) {
-    const filter = buildFilter(query);
-    const sort = buildSort(query);
+    const { filter, sort, populates } = buildQueryParams(query);
 
     const page = parseInt(query.current);
     const limit = parseInt(query.pageSize);
