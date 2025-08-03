@@ -87,7 +87,7 @@ export class RolesService {
 
   async update(_id: string, updateRoleDto: UpdateRoleDto, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(_id)) {
-      throw new BadRequestException(`not found permission with id = ${_id}`)
+      throw new BadRequestException(`not found role with id = ${_id}`)
     }
 
     console.log("check", updateRoleDto);
@@ -115,7 +115,21 @@ export class RolesService {
     return upload;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`not found role with id = ${id}`)
+
+    await this.roleModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
+    return this.roleModel.softDelete(
+      { _id: id }
+    )
   }
 }
