@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Role, RoleDocument } from './schemas/role.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import mongoose from 'mongoose';
+import { buildQueryParams } from 'src/common/utils/query.utils';
 
 @Injectable()
 export class RolesService {
@@ -39,12 +40,49 @@ export class RolesService {
     }
   }
 
-  findAll() {
-    return `This action returns all roles`;
+  async findAll(query: any) {
+    const { filter, sort, populates } = buildQueryParams(query);
+
+    const page = parseInt(query.current);
+    const limit = parseInt(query.pageSize);
+
+    const offset = (page - 1) * limit;
+
+    let defaultLimit = +limit ? +limit : 10
+
+    const totalItems = (await this.roleModel.find(filter)).length
+    const totalPages = Math.ceil(totalItems / defaultLimit)
+
+    const result = await this.roleModel
+      .find(filter)
+      .skip(offset)
+      .limit(limit)
+      .sort(sort)
+      .populate(populates)
+      .exec();
+
+    return {
+      meta: {
+        currentPage: page,
+        pageSize: limit,
+        totalPages: totalPages,
+        totalItems: totalItems
+      },
+      result
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  async findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`not found role with id = ${id}`)
+    }
+
+    return await this.roleModel.findById(id)
+      .populate({
+        path: "permissions",
+        select: { _id: 1, apiPath: 1, name: 1, method: 1 }
+      });
+
   }
 
   async update(_id: string, updateRoleDto: UpdateRoleDto, user: IUser) {

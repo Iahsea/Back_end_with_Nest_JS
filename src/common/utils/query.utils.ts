@@ -61,6 +61,15 @@ export function buildQueryParams(query: any) {
     filter.module = { $regex: query.module, $options: 'i' };
   }
 
+  if (query.isActive !== undefined) {
+    // Vì query từ URL là string nên cần convert sang boolean
+    if (query.isActive === 'true') {
+      filter.isActive = true;
+    } else if (query.isActive === 'false') {
+      filter.isActive = false;
+    }
+  }
+
   // ====== SORT ======
   const sort: any = {};
   if (query.sortBy) {
