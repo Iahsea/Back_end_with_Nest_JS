@@ -12,7 +12,6 @@ export class PermissionsController {
   @Post()
   @ResponseMessage("Create a new permission")
   create(@Body() createPermissionDto: CreatePermissionDto, @User() user: IUser) {
-    console.log("check data controller: ", createPermissionDto);
     return this.permissionsService.create(createPermissionDto, user);
   }
 
@@ -27,8 +26,8 @@ export class PermissionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto) {
-    return this.permissionsService.update(+id, updatePermissionDto);
+  update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto, @User() user: IUser) {
+    return this.permissionsService.update(id, updatePermissionDto, user);
   }
 
   @Delete(':id')

@@ -5,6 +5,7 @@ import { IUser } from 'src/users/users.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Permission, PermissionDocument } from './schemas/permission.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class PermissionsService {
@@ -14,8 +15,6 @@ export class PermissionsService {
   ) { }
 
   async create(createPermissionDto: CreatePermissionDto, user: IUser) {
-    console.log("check data: ", createPermissionDto);
-
     const { name, apiPath, method, module } = createPermissionDto;
 
     const existApiPathAndMethod = await this.permissionModel.findOne({ apiPath, method });
@@ -48,8 +47,22 @@ export class PermissionsService {
     return `This action returns a #${id} permission`;
   }
 
-  update(id: number, updatePermissionDto: UpdatePermissionDto) {
-    return `This action updates a #${id} permission`;
+  async update(_id: string, updatePermissionDto: UpdatePermissionDto, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      throw new BadRequestException(`not found permission with id = ${_id}`)
+    }
+
+    const upload = await this.permissionModel.updateOne(
+      { _id },
+      {
+        ...updatePermissionDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    );
+    return upload;
   }
 
   remove(id: number) {
