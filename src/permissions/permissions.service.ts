@@ -72,8 +72,12 @@ export class PermissionsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} permission`;
+  async findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`not found permission with id = ${id}`)
+    }
+
+    return await this.permissionModel.findById(id)
   }
 
   async update(_id: string, updatePermissionDto: UpdatePermissionDto, user: IUser) {
