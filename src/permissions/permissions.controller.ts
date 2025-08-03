@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -16,8 +16,9 @@ export class PermissionsController {
   }
 
   @Get()
-  findAll() {
-    return this.permissionsService.findAll();
+  @ResponseMessage('Fetch permissions with paginate')
+  findAll(@Query() queryString: any) {
+    return this.permissionsService.findAll(queryString);
   }
 
   @Get(':id')
@@ -26,6 +27,7 @@ export class PermissionsController {
   }
 
   @Patch(':id')
+  @ResponseMessage("Update a permission")
   update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto, @User() user: IUser) {
     return this.permissionsService.update(id, updatePermissionDto, user);
   }

@@ -49,6 +49,18 @@ export function buildQueryParams(query: any) {
     filter.role = { $regex: query.role, $options: 'i' };
   }
 
+  if (query.apiPath) {
+    filter.apiPath = { $regex: query.apiPath, $options: 'i' };
+  }
+
+  if (query.method) {
+    filter.method = { $regex: query.method, $options: 'i' };
+  }
+
+  if (query.module) {
+    filter.module = { $regex: query.module, $options: 'i' };
+  }
+
   // ====== SORT ======
   const sort: any = {};
   if (query.sortBy) {
@@ -67,9 +79,9 @@ export function buildQueryParams(query: any) {
 
 
   // ====== FIELDS ======
-  const fieldsSelect = query.fields
-    ? query.fields.split(',').join(' ')
-    : '';
+  // const fieldsSelect = query.fields
+  //   ? query.fields.split(',').join(' ')
+  //   : '';
 
-  return { filter, sort, populates, fieldsSelect };
+  return { filter, sort, populates };
 }

@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Permission, PermissionDocument } from './schemas/permission.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import mongoose from 'mongoose';
+import { buildQueryParams } from 'src/common/utils/query.utils';
 
 @Injectable()
 export class PermissionsService {
@@ -39,8 +40,36 @@ export class PermissionsService {
     }
   }
 
-  findAll() {
-    return `This action returns all permissions`;
+  async findAll(query: any) {
+    const { filter, sort, populates } = buildQueryParams(query);
+
+    const page = parseInt(query.current);
+    const limit = parseInt(query.pageSize);
+
+    const offset = (page - 1) * limit;
+
+    let defaultLimit = +limit ? +limit : 10
+
+    const totalItems = (await this.permissionModel.find(filter)).length
+    const totalPages = Math.ceil(totalItems / defaultLimit)
+
+    const result = await this.permissionModel
+      .find(filter)
+      .skip(offset)
+      .limit(limit)
+      .sort(sort)
+      .populate(populates)
+      .exec();
+
+    return {
+      meta: {
+        currentPage: page,
+        pageSize: limit,
+        totalPages: totalPages,
+        totalItems: totalItems
+      },
+      result
+    }
   }
 
   findOne(id: number) {
