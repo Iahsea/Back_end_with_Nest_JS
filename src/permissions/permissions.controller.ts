@@ -34,7 +34,8 @@ export class PermissionsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.permissionsService.remove(+id);
+  @ResponseMessage("Delete a permission")
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.permissionsService.remove(id, user);
   }
 }

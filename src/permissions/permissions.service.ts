@@ -98,7 +98,21 @@ export class PermissionsService {
     return upload;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} permission`;
+  async remove(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new BadRequestException(`not found permission with id = ${id}`)
+
+    await this.permissionModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
+    return this.permissionModel.softDelete(
+      { _id: id }
+    )
   }
 }
