@@ -18,7 +18,11 @@ export class RolesService {
   async create(createRoleDto: CreateRoleDto, user: IUser) {
     const { name, description, isActive, permissions } = createRoleDto;
 
-    let isExits = await this.roleModel.findOne({ name })
+    const isExits = await this.roleModel.findOne({ name })
+
+    if (isExits.name === 'ADMIN') {
+      throw new BadRequestException("Không thể xóa role ADMIN")
+    }
 
     if (isExits) {
       throw new BadRequestException(`Role với name "${name}" đã tồn tại`);
@@ -80,7 +84,7 @@ export class RolesService {
     return await this.roleModel.findById(id)
       .populate({
         path: "permissions",
-        select: { _id: 1, apiPath: 1, name: 1, method: 1 }
+        select: { _id: 1, apiPath: 1, name: 1, method: 1, module: 1 }
       });
 
   }
