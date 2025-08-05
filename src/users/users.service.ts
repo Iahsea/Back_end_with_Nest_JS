@@ -9,6 +9,8 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from './users.interface';
 import { buildQueryParams } from 'src/common/utils/query.utils';
 import { ConfigService } from '@nestjs/config';
+import { Role, RoleDocument } from 'src/roles/schemas/role.schema';
+import { ADMIN_ROLE, USER_ROLE } from 'src/databases/sample';
 
 
 @Injectable()
@@ -16,7 +18,8 @@ export class UsersService {
 
   constructor(
     @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
-    private configService: ConfigService
+    @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>,
+    private configService: ConfigService,
   ) { }
 
 
@@ -60,6 +63,9 @@ export class UsersService {
     if (existUser) {
       throw new BadRequestException(`Email ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`)
     }
+
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+
     const hashPassword = this.getHashPassword(password)
     const newRegister = await this.userModel.create({
       name,
@@ -68,7 +74,7 @@ export class UsersService {
       age,
       gender,
       address,
-      role: "USER"
+      role: userRole?.id
     });
     return newRegister;
   }
@@ -121,7 +127,7 @@ export class UsersService {
   findOneByUsername(username: string) {
     return this.userModel.findOne({
       email: username
-    }).populate({ path: "role", select: { name: 1, permission: 1 } })
+    }).populate({ path: "role", select: { name: 1 } })
   }
 
   isValidPassword(password: string, hash: string) {
@@ -147,9 +153,13 @@ export class UsersService {
     if (!mongoose.Types.ObjectId.isValid(id))
       return `not found user`
 
-    const foundUser = await this.userModel.findById(id);
-    if (foundUser.email === this.configService.get<string>("EMAIL_ADMIN")) {
-      throw new BadRequestException("Không thể xóa tài khoản admin@gmail.com")
+    const foundUser = await this.userModel.findById(id)
+      .populate({ path: "role", select: { name: 1, _id: 1 } });
+
+    const role = foundUser.role as unknown as { name: string };
+
+    if (role.name === ADMIN_ROLE) {
+      throw new BadRequestException("Không thể xóa tài khoản có role ADMIN")
     }
 
     await this.userModel.updateOne(
@@ -175,5 +185,6 @@ export class UsersService {
 
   findUserByRefreshToken = async (refreshToken: string) => {
     return await this.userModel.findOne({ refreshToken })
+      .populate({ path: "role", select: { name: 1 } })
   }
 }

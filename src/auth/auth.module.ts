@@ -11,10 +11,12 @@ import { UsersService } from 'src/users/users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
 import ms from 'ms';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports: [
     UsersModule,
+    RolesModule,
     PassportModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.registerAsync({
@@ -29,8 +31,8 @@ import ms from 'ms';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, UsersService],
-  exports: [AuthService, UsersService],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
+  exports: [AuthService],
 
 })
 export class AuthModule { }
