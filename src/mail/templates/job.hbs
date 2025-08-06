@@ -1,80 +1,83 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Welcome Email</title>
-  <style>
-    body {
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .email-container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: #ffffff;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #4e73df, #224abe);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .content {
-      padding: 30px;
-      color: #333;
-    }
-    .content h2 {
-      margin-top: 0;
-      color: #4e73df;
-    }
-    .content p {
-      line-height: 1.6;
-    }
-    .btn {
-      display: inline-block;
-      background: #4e73df;
-      color: white;
-      padding: 12px 24px;
-      margin-top: 20px;
-      text-decoration: none;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    .btn:hover {
-      background: #375ab7;
-    }
-    .footer {
-      background: #f1f1f1;
-      padding: 15px;
-      text-align: center;
-      font-size: 12px;
-      color: #888;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <div class="header">
-      <h1>Chào mừng {{username}}!</h1>
-    </div>
-    <div class="content">
-      <h2>Cảm ơn bạn đã đăng ký {{appName}}</h2>
-      <p>Chúng tôi rất vui được chào đón bạn. Hãy nhấn nút bên dưới để xác nhận email của bạn và bắt đầu trải nghiệm những tính năng tuyệt vời nhất.</p>
-      <a href="{{confirmUrl}}" class="btn">Xác nhận Email</a>
-      <p>Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này.</p>
-    </div>
-    <div class="footer">
-      &copy; {{year}} {{appName}}. All rights reserved.
-    </div>
-  </div>
-</body>
+  <body style="margin:0; padding:0; background-color:#f5f7fa; font-family: 'Segoe UI', Arial, sans-serif;">
+
+    <!-- Wrapper -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 40px 0;">
+
+          <!-- Container -->
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="620" 
+                 style="background-color: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,0.06);">
+
+            <!-- Header Gradient -->
+            <tr>
+              <td align="center" style="background: linear-gradient(135deg, #2563eb, #4f46e5); padding: 50px 20px;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">
+                  📄 Phản hồi CV từ {{appName}}
+                </h1>
+                <p style="color: #e0e7ff; margin: 10px 0 0; font-size: 15px;">
+                  Xin chào <strong>{{username}}</strong>, chúng tôi đã xem xét hồ sơ của bạn
+                </p>
+              </td>
+            </tr>
+
+            <!-- Nội dung -->
+            <tr>
+              <td style="padding: 40px; color: #374151; font-size: 16px; line-height: 1.6;">
+                <p style="margin: 0 0 15px;">
+                  Cảm ơn bạn đã ứng tuyển cho vị trí <strong>{{position}}</strong> tại <strong>{{appName}}</strong>.
+                </p>
+                <p style="margin: 0 0 20px;">
+                  Sau khi xem xét hồ sơ của bạn, chúng tôi xin gửi đến bạn phản hồi dưới đây:
+                </p>
+
+                <!-- Feedback Card -->
+                <div style="background-color: #f9fafb; border-left: 5px solid #2563eb; padding: 18px 20px; border-radius: 8px; font-style: italic; color: #374151;">
+                  {{feedback}}
+                </div>
+
+                <!-- Button -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 35px 0 15px;">
+                  <tr>
+                    <td align="center" bgcolor="#2563eb" style="border-radius: 10px;">
+                      <a href="{{viewCvUrl}}" target="_blank"
+                         style="display: inline-block; padding: 14px 28px; color: #ffffff; font-size: 16px; 
+                                font-weight: 600; text-decoration: none; border-radius: 10px; letter-spacing: 0.3px;">
+                        🔍 Xem CV của bạn
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Extra Note -->
+                <p style="color: #6b7280; font-size: 14px; margin-top: 25px;">
+                  Nếu bạn có bất kỳ câu hỏi nào, vui lòng trả lời lại email này hoặc liên hệ trực tiếp với chúng tôi.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Divider -->
+            <tr>
+              <td style="padding: 0 40px;">
+                <hr style="border: 0; border-top: 1px solid #e5e7eb;">
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding: 25px 40px; text-align: center; font-size: 13px; color: #9ca3af;">
+                &copy; {{year}} {{appName}}. Mọi quyền được bảo lưu.<br>
+                Email này được gửi tự động, vui lòng không trả lời.
+              </td>
+            </tr>
+
+          </table>
+          <!-- End Container -->
+
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
