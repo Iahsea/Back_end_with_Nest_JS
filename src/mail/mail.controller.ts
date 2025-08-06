@@ -18,7 +18,13 @@ export class MailController {
       to: "ngyenchinhhai@gmail.com",
       from: '"Support Team" <support@example.com>', // override default from
       subject: 'Welcome to Nice App! Confirm your Email',
-      html: '<b>welcome bla bla iahsea</b>', // HTML body content
+      template: "job",
+      context: {
+        username: 'Nguyễn Văn A', // Truyền đúng tên biến như trong template
+        appName: 'Nice App',
+        confirmUrl: `https://yourapp.com/verify?email`,
+        year: new Date().getFullYear()
+      }
     });
   }
 

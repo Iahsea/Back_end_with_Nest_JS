@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome Email</title>
+  <style>
+    body {
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #4e73df, #224abe);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 30px;
+      color: #333;
+    }
+    .content h2 {
+      margin-top: 0;
+      color: #4e73df;
+    }
+    .content p {
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      background: #4e73df;
+      color: white;
+      padding: 12px 24px;
+      margin-top: 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background: #375ab7;
+    }
+    .footer {
+      background: #f1f1f1;
+      padding: 15px;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>Chào mừng {{username}}!</h1>
+    </div>
+    <div class="content">
+      <h2>Cảm ơn bạn đã đăng ký {{appName}}</h2>
+      <p>Chúng tôi rất vui được chào đón bạn. Hãy nhấn nút bên dưới để xác nhận email của bạn và bắt đầu trải nghiệm những tính năng tuyệt vời nhất.</p>
+      <a href="{{confirmUrl}}" class="btn">Xác nhận Email</a>
+      <p>Nếu bạn không đăng ký tài khoản này, vui lòng bỏ qua email này.</p>
+    </div>
+    <div class="footer">
+      &copy; {{year}} {{appName}}. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
