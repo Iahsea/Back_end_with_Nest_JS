@@ -19,14 +19,10 @@ export class MailController {
   ) { }
 
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
-  handleCron() {
-    console.log(">>>>> test cron");
-  }
-
 
   @Get()
   @Public()
+  @Cron('0 10 0 * * 0') // 0.10 am every sunday
   @ResponseMessage("Test email")
   async handleTestEmail() {
 
