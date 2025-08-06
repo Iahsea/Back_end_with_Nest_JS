@@ -18,7 +18,7 @@ export class SubscribersController {
   @Post("skills")
   @ResponseMessage("Get subscriber's skills")
   @SkipCheckPermission()
-  getUsersSkills(@User() user: IUser) {
+  getUserSkills(@User() user: IUser) {
     return this.subscribersService.getSkills(user);
   }
 
