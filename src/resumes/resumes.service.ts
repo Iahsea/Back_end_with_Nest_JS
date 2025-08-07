@@ -7,13 +7,15 @@ import { Resume, ResumeDocument } from './schemas/resume.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import mongoose from 'mongoose';
 import { buildQueryParams } from 'src/common/utils/query.utils';
-import { HR_ROLE } from 'src/databases/sample';
+import { HR_ROLE, USER_ROLE } from 'src/databases/sample';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ResumesService {
 
   constructor(
-    @InjectModel(Resume.name) private resumeModel: SoftDeleteModel<ResumeDocument>
+    @InjectModel(Resume.name) private resumeModel: SoftDeleteModel<ResumeDocument>,
+    private userService: UsersService,
   ) { }
 
   async create(createUserCvDto: CreateUserCvDto, user: IUser) {
@@ -45,14 +47,12 @@ export class ResumesService {
 
   async findAll(query: any, user: IUser) {
     const { filter, sort, populates } = buildQueryParams(query);
-    const { role, company } = user
 
-    const roleName = role.name;
-    console.log("check company", user);
+    const companyId = (await this.userService.findOne(user._id)).company?._id;
 
-    // Nếu là HR thì thêm điều kiện lọc companyId
-
-
+    if (user.role.name === HR_ROLE && companyId) {
+      filter.companyId = companyId;
+    }
 
     const page = parseInt(query.current);
     const limit = parseInt(query.pageSize);
@@ -83,13 +83,34 @@ export class ResumesService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found resume with id = ${id}`)
+      throw new BadRequestException(`Resume ID không hợp lệ: ${id}`);
     }
 
-    return await this.resumeModel.findById(id)
+    const resume = await this.resumeModel.findById(id);
+    if (!resume) {
+      throw new BadRequestException(`Không tìm thấy resume với id = ${id}`);
+    }
+
+    // Lấy companyId của user hiện tại
+    const companyIdUser = (await this.userService.findOne(user._id)).company?._id;
+    const companyIdResume = resume.companyId;
+
+    // Nếu user là HR, kiểm tra quyền truy cập
+    if (user.role.name === HR_ROLE && companyIdUser.toString() !== companyIdResume.toString()) {
+      throw new BadRequestException(`Bạn không có quyền truy cập chức năng này`);
+    }
+
+    const userIdResume = (await this.resumeModel.findById(id)).userId;
+
+    if (user.role.name === USER_ROLE && userIdResume.toString() !== user._id.toString()) {
+      throw new BadRequestException(`Bạn không có quyền truy cập chức năng này`);
+    }
+
+    return resume;
   }
+
 
   async handleFindResumeByUser(user: IUser) {
     return await this.resumeModel.find({
@@ -138,7 +159,7 @@ export class ResumesService {
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id))
-      throw new BadRequestException("not found resume")
+      return `not found resume`
 
     await this.resumeModel.updateOne(
       { _id: id },
