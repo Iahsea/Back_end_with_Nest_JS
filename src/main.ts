@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 require('dotenv').config();
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,6 +43,8 @@ async function bootstrap() {
 
   //config cookies
   app.use(cookieParser());
+
+  app.use(helmet());
 
   await app.listen(configService.get<string>('PORT'));
 }
