@@ -11,6 +11,7 @@ import { response, Response } from 'express';
 import ms, { StringValue } from 'ms';
 import { RolesService } from 'src/roles/roles.service';
 import { permission } from 'process';
+import { CompaniesService } from 'src/companies/companies.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
         private usersService: UsersService,
         private jwtService: JwtService,
         private rolesService: RolesService,
+        private companyService: CompaniesService,
         private configService: ConfigService,
         @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>
     ) { }
@@ -28,11 +30,18 @@ export class AuthService {
             const isValid = this.usersService.isValidPassword(pass, user.password)
             if (isValid === true) {
                 const userRole = user.role as unknown as { _id: string; name: string }
-                const temp = await this.rolesService.findOne(userRole._id);
+                const tempRole = await this.rolesService.findOne(userRole._id);
+
+                const userCompany = user.company as unknown as { _id: string; name: string };
+
 
                 const objUser = {
                     ...user.toObject(),
-                    permissions: temp?.permissions ?? []
+                    permissions: tempRole?.permissions ?? [],
+                    company: {
+                        _id: userCompany._id.toString(),
+                        name: userCompany.name,
+                    }
                 }
 
                 return objUser;
@@ -42,14 +51,15 @@ export class AuthService {
     }
 
     async login(user: IUser, response: Response) {
-        const { _id, name, email, role, permissions } = user;
+        const { _id, name, email, role, permissions, company } = user;
         const payload = {
             sub: "token login",
             iss: "from server",
             _id,
             name,
             email,
-            role
+            role,
+            company
         };
 
         const refresh_token = this.createRefreshToken(payload)
@@ -71,6 +81,7 @@ export class AuthService {
                 email,
                 role,
                 permissions,
+                company,
             }
         };
     }
@@ -105,6 +116,9 @@ export class AuthService {
             )
             let user = await this.usersService.findUserByRefreshToken(refreshToken)
 
+            const userCompany = user.company as unknown as { _id: string; name: string };
+
+
             if (user) {
                 const { _id, name, email, role } = user;
                 const payload = {
@@ -113,7 +127,11 @@ export class AuthService {
                     _id,
                     name,
                     email,
-                    role
+                    role,
+                    company: {
+                        _id: userCompany._id.toString(),
+                        name: userCompany.name
+                    }
                 };
 
                 const refresh_token = this.createRefreshToken(payload)

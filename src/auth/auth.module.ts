@@ -12,11 +12,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
 import ms from 'ms';
 import { RolesModule } from 'src/roles/roles.module';
+import { CompaniesModule } from 'src/companies/companies.module';
 
 @Module({
   imports: [
     UsersModule,
     RolesModule,
+    CompaniesModule,
     PassportModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.registerAsync({

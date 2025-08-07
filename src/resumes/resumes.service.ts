@@ -7,6 +7,7 @@ import { Resume, ResumeDocument } from './schemas/resume.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import mongoose from 'mongoose';
 import { buildQueryParams } from 'src/common/utils/query.utils';
+import { HR_ROLE } from 'src/databases/sample';
 
 @Injectable()
 export class ResumesService {
@@ -42,8 +43,16 @@ export class ResumesService {
     };
   }
 
-  async findAll(query: any) {
+  async findAll(query: any, user: IUser) {
     const { filter, sort, populates } = buildQueryParams(query);
+    const { role, company } = user
+
+    const roleName = role.name;
+    console.log("check company", user);
+
+    // Nếu là HR thì thêm điều kiện lọc companyId
+
+
 
     const page = parseInt(query.current);
     const limit = parseInt(query.pageSize);
@@ -129,7 +138,7 @@ export class ResumesService {
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id))
-      return `not found resume`
+      throw new BadRequestException("not found resume")
 
     await this.resumeModel.updateOne(
       { _id: id },

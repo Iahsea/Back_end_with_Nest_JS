@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -76,7 +76,7 @@ export class JobsService {
 
   async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id))
-      return `not found job`
+      throw new BadRequestException("not found job")
 
     return await this.jobModel.findById(id)
   }
@@ -100,7 +100,7 @@ export class JobsService {
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id))
-      return `not found user`
+      throw new BadRequestException("not found job")
 
     await this.jobModel.updateOne(
       { _id: id },

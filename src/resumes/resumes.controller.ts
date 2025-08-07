@@ -23,8 +23,8 @@ export class ResumesController {
 
   @Get()
   @ResponseMessage('Fetch all resumes with paginate')
-  findAll(@Query() queryString: any) {
-    return this.resumesService.findAll(queryString);
+  findAll(@Query() queryString: any, @User() user: IUser) {
+    return this.resumesService.findAll(queryString, user);
   }
 
   @Get(':id')

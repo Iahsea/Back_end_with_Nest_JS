@@ -6,7 +6,7 @@ import { Permission, PermissionDocument } from 'src/permissions/schemas/permissi
 import { Role, RoleDocument } from 'src/roles/schemas/role.schema';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
-import { ADMIN_ROLE, INIT_PERMISSIONS, USER_ROLE } from './sample';
+import { ADMIN_ROLE, HR_ROLE, INIT_PERMISSIONS, USER_ROLE } from './sample';
 
 @Injectable()
 export class DatabasesService implements OnModuleInit {
@@ -49,6 +49,12 @@ export class DatabasesService implements OnModuleInit {
                         description: "Người dùng/Ứng viên sử dụng hệ thống",
                         isActive: true,
                         permissions: [] //không set quyền, chỉ cần add ROLE
+                    },
+                    {
+                        name: HR_ROLE,
+                        description: "Nhà tuyển dụng có quyền quản lý tin tuyển dụng, tìm kiếm và tiếp nhận hồ sơ ứng viên",
+                        isActive: true,
+                        permissions: []
                     }
                 ])
             }
@@ -56,6 +62,7 @@ export class DatabasesService implements OnModuleInit {
             if (countUser === 0) {
                 const adminRole = await this.roleModel.findOne({ name: ADMIN_ROLE });
                 const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+                const hrRole = await this.roleModel.findOne({ name: HR_ROLE });
 
                 await this.userModel.insertMany([
                     {
@@ -84,6 +91,15 @@ export class DatabasesService implements OnModuleInit {
                         gender: "MALE",
                         address: "VietNam",
                         role: userRole?._id,
+                    },
+                    {
+                        name: "I'm normal HR",
+                        email: "hr@gmail.com",
+                        password: this.userService.getHashPassword(this.configService.get<string>("INIT_PASSWORD")),
+                        age: 69,
+                        gender: "MALE",
+                        address: "VietNam",
+                        role: hrRole?._id,
                     }
                 ]);
             }

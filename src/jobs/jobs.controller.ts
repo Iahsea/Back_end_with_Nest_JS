@@ -38,6 +38,8 @@ export class JobsController {
   @ResponseMessage("Delete a job")
   @Delete(':id')
   remove(@Param('id') id: string, @User() user: IUser) {
+    console.log("check user", user);
+
     return this.jobsService.remove(id, user);
   }
 }
