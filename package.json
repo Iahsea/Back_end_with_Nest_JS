@@ -55,6 +55,7 @@
     "soft-delete-plugin-mongoose": "^1.0.17"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.26",
     "@nestjs/cli": "^10.2.3",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.3.2",
