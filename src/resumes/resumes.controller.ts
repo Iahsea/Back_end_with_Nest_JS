@@ -1,12 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { ResumesService } from './resumes.service';
 import { CreateResumeDto, CreateUserCvDto } from './dto/create-resume.dto';
 import { UpdateResumeDto } from './dto/update-resume.dto';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { CheckPolicies, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/users.interface';
 import { ApiTags } from '@nestjs/swagger';
+import { CaslGuard } from 'src/casl/casl.guard';
+import { Resume } from './schemas/resume.schema';
 
 @ApiTags('resumes')
+@UseGuards(CaslGuard)
 @Controller('resumes')
 export class ResumesController {
   constructor(private readonly resumesService: ResumesService) { }
@@ -24,6 +27,7 @@ export class ResumesController {
   }
 
   @Get()
+  @CheckPolicies({ action: 'read', subject: Resume })
   @ResponseMessage('Fetch all resumes with paginate')
   findAll(@Query() queryString: any, @User() user: IUser) {
     return this.resumesService.findAll(queryString, user);

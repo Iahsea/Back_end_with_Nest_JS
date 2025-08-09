@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext, SetMetadata } from '@nestjs/common';
+import { Actions, Subjects } from 'src/casl/casl-ability.factory/casl-ability.factory';
 
 
 export const IS_PUBLIC_KEY = 'isPublic';
@@ -17,3 +18,13 @@ export const User = createParamDecorator(
 
 export const IS_PUBLIC_PERMISSIONS = 'isPublicPermission'
 export const SkipCheckPermission = () => SetMetadata(IS_PUBLIC_PERMISSIONS, true);
+
+
+export interface RequiredRule {
+    action: Actions;
+    subject: Subjects;
+}
+
+export const IS_CASL = 'casl'
+export const CheckPolicies = (...requirements: RequiredRule[]) =>
+    SetMetadata(IS_CASL, requirements);
