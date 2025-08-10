@@ -5,11 +5,9 @@ import { UpdateResumeDto } from './dto/update-resume.dto';
 import { CheckPolicies, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/users.interface';
 import { ApiTags } from '@nestjs/swagger';
-import { CaslGuard } from 'src/casl/casl.guard';
 import { Resume } from './schemas/resume.schema';
 
 @ApiTags('resumes')
-@UseGuards(CaslGuard)
 @Controller('resumes')
 export class ResumesController {
   constructor(private readonly resumesService: ResumesService) { }
@@ -27,13 +25,14 @@ export class ResumesController {
   }
 
   @Get()
-  @CheckPolicies({ action: 'read', subject: Resume })
+  @CheckPolicies({ action: 'list', subject: Resume })
   @ResponseMessage('Fetch all resumes with paginate')
   findAll(@Query() queryString: any, @User() user: IUser) {
     return this.resumesService.findAll(queryString, user);
   }
 
   @Get(':id')
+  @CheckPolicies({ action: 'read', subject: Resume })
   @ResponseMessage('Fetch a resume by id')
   findOne(@Param('id') id: string, @User() user: IUser) {
     return this.resumesService.findOne(id, user);

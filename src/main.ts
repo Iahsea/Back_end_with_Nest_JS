@@ -10,6 +10,8 @@ import { join } from 'path';
 require('dotenv').config();
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CaslGuard } from './casl/casl.guard';
+import { CaslAbilityFactory } from './casl/casl-ability.factory/casl-ability.factory';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,7 +21,10 @@ async function bootstrap() {
     // forbidNonWhitelisted: true
   }));
   const reflector = app.get(Reflector);
-  app.useGlobalGuards(new JwtAuthGuard(reflector));
+  app.useGlobalGuards(
+    new JwtAuthGuard(reflector),
+    new CaslGuard(reflector, app.get(CaslAbilityFactory))
+  );
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
   app.useStaticAssets(join(__dirname, '..', 'public')); //js, css, images

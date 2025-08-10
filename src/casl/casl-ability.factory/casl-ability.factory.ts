@@ -11,6 +11,7 @@ import { Role } from 'src/roles/schemas/role.schema';
 import { Permission } from 'src/permissions/schemas/permission.schema';
 import { IUser } from 'src/users/users.interface';
 import { HR_ROLE } from 'src/databases/sample';
+import { UsersService } from 'src/users/users.service';
 
 
 // Định nghĩa các actions và subjects
@@ -26,6 +27,7 @@ export class CaslAbilityFactory {
     constructor(
         @InjectModel(Permission.name) private permissionModel: Model<Permission>,
         @InjectModel(Role.name) private roleModel: Model<Role>,
+        private userService: UsersService,
     ) { }
 
     async createForUser(user: any) {
@@ -40,12 +42,14 @@ export class CaslAbilityFactory {
         if (userRole && userRole.permissions) {
             // Xử lý từng permission
             for (const permission of userRole.permissions) {
-                const action = this.mapMethodToAction(permission.method);
+                const action = this.mapMethodToAction(permission.method, permission.apiPath);
+
                 const subject = this.mapModuleToSubject(permission.module);
 
                 if (action && subject) {
                     // Áp dụng permission với điều kiện cụ thể
-                    can(action, subject, this.buildConditions(permission, user));
+                    const conditions = await this.buildConditions(permission, user);
+                    can(action, subject, conditions);
                 }
             }
         }
@@ -61,14 +65,23 @@ export class CaslAbilityFactory {
     }
 
     // Map HTTP method sang CASL action
-    private mapMethodToAction(method: string): Actions | null {
-        const methodMap = {
-            'GET': 'read',
-            'POST': 'create',
-            'PUT': 'update',
-            'PATCH': 'update',
-            'DELETE': 'delete',
+    private mapMethodToAction(method: string, apiPath: string): Actions | null {
+        if (method.toUpperCase() === 'GET') {
+            // Nếu kết thúc bằng /:id thì là 'read'
+            if (/\/:id$/i.test(apiPath)) {
+                return 'read';
+            }
+            // Ngược lại là 'list'
+            return 'list';
+        }
+
+        const methodMap: Record<string, Actions> = {
+            POST: 'create',
+            PUT: 'update',
+            PATCH: 'update',
+            DELETE: 'delete',
         };
+
         return methodMap[method.toUpperCase()] || null;
     }
 
@@ -85,12 +98,15 @@ export class CaslAbilityFactory {
     }
 
     // Xây dựng điều kiện cho permission
-    private buildConditions(permission: any, user: any): any {
+    private async buildConditions(permission: any, user: any): Promise<any> {
         const conditions: any = {};
 
-        // Nếu user có company, chỉ cho phép truy cập data của company đó
-        if (user.role.name === HR_ROLE && user.company && user.company._id) {
-            conditions.companyId = user.company._id;
+        // Nếu user có role là HR, chỉ cho phép truy cập data resume của company đó 
+        if (user.role.name === HR_ROLE) {
+            const companyId = await this.userService.findOne(user._id);
+            if (companyId) {
+                conditions.companyId = companyId.company._id;
+            }
         }
 
         // Có thể thêm các điều kiện khác dựa trên permission cụ thể
