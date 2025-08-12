@@ -19,9 +19,26 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { HealthModule } from './health/health.module';
 import { CaslModule } from './casl/casl.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { StudentsModule } from './students/students.module';
+import { createKeyv, Keyv } from '@keyv/redis';
+import { CacheableMemory } from 'cacheable';
 
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => {
+        return {
+          stores: [
+            new Keyv({
+              store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
+            }),
+            createKeyv('redis://@localhost:6379'), // Cấu hình kết nối Redis
+          ],
+        };
+      },
+    }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({
       throttlers: [
@@ -58,7 +75,8 @@ import { CaslModule } from './casl/casl.module';
     SubscribersModule,
     MailModule,
     HealthModule,
-    CaslModule
+    CaslModule,
+    StudentsModule
   ],
   controllers: [AppController],
   providers: [

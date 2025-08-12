@@ -17,7 +17,7 @@ services:
     image: redis:latest
     container_name: my-redis
     ports:
-    - "6380:6379"     # Host port 6380 → Container port 6379
+    - "6379:6379"     
     volumes:
       - redis-data:/data # lưu file .rdb/.aof ra host để không mất dữ liệu khi container bị xoá
     command: ["redis-server", "--appendonly", "yes"] # bật AOF để lưu dữ liệu bền hơn
@@ -41,6 +41,15 @@ services:
     depends_on:
       - db-mongo
       - redis      
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: my-redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+
 volumes:
   mongodb:
   redis-data:     

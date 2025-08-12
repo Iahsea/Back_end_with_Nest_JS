@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject } from '@nestjs/common';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,22 +7,29 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/users.interface';
 import mongoose from 'mongoose';
 import { buildQueryParams } from 'src/common/utils/query.utils';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CompaniesService {
 
   constructor(
-    @InjectModel(Company.name) private companyModel: SoftDeleteModel<CompanyDocument>
+    @InjectModel(Company.name) private companyModel: SoftDeleteModel<CompanyDocument>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) { }
 
-  create(createCompanyDto: CreateCompanyDto, user: IUser) {
-    return this.companyModel.create({
+  async create(createCompanyDto: CreateCompanyDto, user: IUser) {
+    const created = await this.companyModel.create({
       ...createCompanyDto,
       createdBy: {
         _id: user._id,
         email: user.email
       }
     })
+    // Xóa toàn bộ cache sau khi tạo mới
+    await this.cacheManager.clear();
+
+    return created;
   }
 
   async findAll(query: any) {
@@ -34,10 +41,8 @@ export class CompaniesService {
     const offset = (page - 1) * limit;
 
     let defaultLimit = +limit ? +limit : 10
-
     const totalItems = (await this.companyModel.find(filter)).length
     const totalPages = Math.ceil(totalItems / defaultLimit)
-
 
     const result = await this.companyModel
       .find(filter)
@@ -55,7 +60,8 @@ export class CompaniesService {
         totalItems: totalItems
       },
       result
-    }
+    };
+
   }
 
 
@@ -64,11 +70,12 @@ export class CompaniesService {
       throw new BadRequestException(`not found company with id = ${id}`)
     }
 
-    return await this.companyModel.findById(id)
+    return await this.companyModel.findById(id);
+
   }
 
   async update(id: string, updateCompanyDto: UpdateCompanyDto, user: IUser) {
-    return await this.companyModel.updateOne(
+    const result = await this.companyModel.updateOne(
       { _id: id },
       {
         ...updateCompanyDto,
@@ -78,6 +85,11 @@ export class CompaniesService {
         }
       }
     );
+
+    // Xóa toàn bộ cache sau khi cập nhật
+    await this.cacheManager.clear();
+
+    return result;
   }
 
   async remove(id: string, user: IUser) {
@@ -90,8 +102,15 @@ export class CompaniesService {
         }
       }
     )
-    return this.companyModel.softDelete(
-      { _id: id }
-    )
+
+    const result = await this.companyModel.softDelete({ _id: id });
+
+    if (result.deleted) {
+      // Xóa toàn bộ cache sau khi xóa
+      await this.cacheManager.clear();
+      console.log('Cache cleared after delete');
+    }
+
+    return result;
   }
 }
