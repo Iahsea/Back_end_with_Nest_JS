@@ -20,7 +20,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { HealthModule } from './health/health.module';
 import { CaslModule } from './casl/casl.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import { StudentsModule } from './students/students.module';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
 
@@ -76,7 +75,6 @@ import { CacheableMemory } from 'cacheable';
     MailModule,
     HealthModule,
     CaslModule,
-    StudentsModule
   ],
   controllers: [AppController],
   providers: [

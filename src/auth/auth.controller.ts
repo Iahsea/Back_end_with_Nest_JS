@@ -9,6 +9,7 @@ import { IUser } from 'src/users/users.interface';
 import { RolesService } from 'src/roles/roles.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { GoogleAuthGuard } from './google-auth.guard';
 
 @ApiTags('auth')
 @Controller("auth")
@@ -67,5 +68,25 @@ export class AuthController {
         @User() user: IUser
     ) {
         return this.authService.handleLogout(response, user);
+    }
+
+    @Public()
+    @UseGuards(GoogleAuthGuard)
+    @Get('/google/login')
+    googleLogin(@Req() req) {
+        console.log('User in login:', req.user);
+    }
+
+
+    @Public()
+    @UseGuards(GoogleAuthGuard)
+    @Get('/google/callback')
+    async googleCallBack(
+        @Req() req,
+        @Res() response: Response
+    ) {
+        const tokens = await this.authService.login(req, response)
+        // redirect về front-end kèm token
+        return response.redirect(`http://localhost:3000?token=${tokens.access_token}`)
     }
 }

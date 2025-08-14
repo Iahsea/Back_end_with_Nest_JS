@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsEmail, IsMongoId, IsNotEmpty, IsNotEmptyObject, IsObject, IsString, ValidateNested } from "class-validator";
+import { IsEmail, IsMongoId, IsNotEmpty, IsNotEmptyObject, IsObject, IsOptional, IsString, ValidateNested } from "class-validator";
 import mongoose from "mongoose";
 
 class Company {
@@ -93,4 +93,27 @@ export class UserLoginDto {
     description: 'password'
   })
   readonly password: string;
+}
+
+export class UserLoginGoogleDto {
+  @ApiProperty()
+  @IsNotEmpty({ message: 'googleId không được để trống', })
+  googleId: string;
+
+  @ApiProperty()
+  @IsEmail({}, { message: 'Email không đúng định dạng', })
+  @IsNotEmpty({ message: 'Email không được để trống', })
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'Name không được để trống', })
+  name: string;
+
+  @ApiProperty()
+  @IsOptional()
+  avatarUrl?: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'provider không được để trống', })
+  provider: string;
 }

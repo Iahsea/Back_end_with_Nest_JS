@@ -13,7 +13,7 @@ export class User {
     @Prop({ required: true })
     email: string;
 
-    @Prop({ required: true })
+    @Prop({ required: false })
     password: string;
 
     @Prop()
@@ -24,6 +24,15 @@ export class User {
 
     @Prop()
     address: string;
+
+    @Prop()
+    googleId: string; // Google ID
+
+    @Prop()
+    provider: string; // 'google', 'facebook', ...
+
+    @Prop()
+    avatarUrl?: string;
 
     @Prop({ type: Object })
     company: {

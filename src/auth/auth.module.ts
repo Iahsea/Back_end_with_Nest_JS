@@ -13,6 +13,8 @@ import { User, UserSchema } from 'src/users/schemas/user.schema';
 import ms from 'ms';
 import { RolesModule } from 'src/roles/roles.module';
 import { CompaniesModule } from 'src/companies/companies.module';
+import { GoogleStrategy } from './passport/google.strategy';
+import { Role, RoleSchema } from 'src/roles/schemas/role.schema';
 
 @Module({
   imports: [
@@ -20,7 +22,10 @@ import { CompaniesModule } from 'src/companies/companies.module';
     RolesModule,
     CompaniesModule,
     PassportModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Role.name, schema: RoleSchema }
+    ]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -33,7 +38,7 @@ import { CompaniesModule } from 'src/companies/companies.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
   exports: [AuthService],
 
 })
