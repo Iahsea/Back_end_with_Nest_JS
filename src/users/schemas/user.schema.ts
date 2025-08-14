@@ -10,7 +10,7 @@ export class User {
     @Prop()
     name: string;
 
-    @Prop({ required: true })
+    @Prop({ required: false })
     email: string;
 
     @Prop({ required: false })
@@ -26,7 +26,10 @@ export class User {
     address: string;
 
     @Prop()
-    googleId: string; // Google ID
+    googleId: string; // Google Id
+
+    @Prop()
+    facebookId: string; // Facebook Id
 
     @Prop()
     provider: string; // 'google', 'facebook', ...

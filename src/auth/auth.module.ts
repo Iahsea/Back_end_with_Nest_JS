@@ -15,6 +15,7 @@ import { RolesModule } from 'src/roles/roles.module';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { GoogleStrategy } from './passport/google.strategy';
 import { Role, RoleSchema } from 'src/roles/schemas/role.schema';
+import { FacebookStrategy } from './passport/facebook.strategy';
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { Role, RoleSchema } from 'src/roles/schemas/role.schema';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy, FacebookStrategy],
   exports: [AuthService],
 
 })

@@ -5,7 +5,7 @@ import { IUser } from 'src/users/users.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { CreateUserDto, RegisterUserDto, UserLoginGoogleDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto, RegisterUserDto, UserLoginFacebookDto, UserLoginGoogleDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { response, Response } from 'express';
 import ms, { StringValue } from 'ms';
@@ -174,6 +174,34 @@ export class AuthService {
                 name: googleUser.name,
                 avatarUrl: googleUser.avatarUrl,
                 provider: 'google',
+                password: null,
+                role: newUserRole?.id
+            })
+        }
+
+        // 3. Lấy quyền
+        const userRole = user.role as unknown as { _id: string; name: string }
+        const temp = await this.rolesService.findOne(userRole._id);
+
+        return {
+            ...user.toObject(),
+            permissions: temp?.permissions ?? []
+        };
+    }
+
+    async validateFacebookUser(facebookUser: UserLoginFacebookDto) {
+
+        const newUserRole = await this.roleModel.findOne({ name: USER_ROLE });
+        // check theo google id
+        let user = await this.userModel.findOne({ facebookId: facebookUser.facebookId })
+
+        if (!user) {
+            user = await this.userModel.create({
+                facebookId: facebookUser.facebookId,
+                email: facebookUser?.email,
+                name: facebookUser.name,
+                avatarUrl: facebookUser.avatarUrl,
+                provider: 'facebook',
                 password: null,
                 role: newUserRole?.id
             })

@@ -10,6 +10,7 @@ import { RolesService } from 'src/roles/roles.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { GoogleAuthGuard } from './google-auth.guard';
+import { FacebookAuthGuard } from './facebook-auth.guard';
 
 @ApiTags('auth')
 @Controller("auth")
@@ -85,6 +86,26 @@ export class AuthController {
         @Req() req,
         @Res() response: Response
     ) {
+        const tokens = await this.authService.login(req, response)
+        // redirect về front-end kèm token
+        return response.redirect(`http://localhost:3000?token=${tokens.access_token}`)
+    }
+
+
+    @Public()
+    @Get("/facebook/login")
+    @UseGuards(FacebookAuthGuard)
+    async facebookLogin(): Promise<any> {
+
+    }
+
+    @Public()
+    @Get("/facebook/callback")
+    @UseGuards(FacebookAuthGuard)
+    async facebookLoginRedirect(
+        @Req() req,
+        @Res() response: Response
+    ): Promise<any> {
         const tokens = await this.authService.login(req, response)
         // redirect về front-end kèm token
         return response.redirect(`http://localhost:3000?token=${tokens.access_token}`)

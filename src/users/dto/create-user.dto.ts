@@ -117,3 +117,26 @@ export class UserLoginGoogleDto {
   @IsNotEmpty({ message: 'provider không được để trống', })
   provider: string;
 }
+
+export class UserLoginFacebookDto {
+  @ApiProperty()
+  @IsNotEmpty({ message: 'facebookId không được để trống', })
+  facebookId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsEmail({}, { message: 'Email không đúng định dạng', })
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'Name không được để trống', })
+  name: string;
+
+  @ApiProperty()
+  @IsOptional()
+  avatarUrl?: string;
+
+  @ApiProperty()
+  @IsNotEmpty({ message: 'provider không được để trống', })
+  provider: string;
+}

@@ -35,8 +35,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
             password: ''
         }
 
-        const user = await this.authService.validateGoogleUser(googleUserDto);
-        return done(null, user);
+        try {
+            const user = await this.authService.validateGoogleUser(googleUserDto);
+            return done(null, user);
+        } catch (error) {
+            return done(error, null);
+        }
     }
 
 }
