@@ -22,6 +22,9 @@ import { CaslModule } from './casl/casl.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
+import { GatewayModule } from './gateway/gateway.module';
+import { ChatModule } from './chat/chat.module';
+import { MessageService } from './message/message.service';
 
 @Module({
   imports: [
@@ -75,10 +78,13 @@ import { CacheableMemory } from 'cacheable';
     MailModule,
     HealthModule,
     CaslModule,
+    GatewayModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    MessageService,
   ],
 })
 export class AppModule { }
