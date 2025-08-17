@@ -24,7 +24,9 @@ import { createKeyv, Keyv } from '@keyv/redis';
 import { CacheableMemory } from 'cacheable';
 import { GatewayModule } from './gateway/gateway.module';
 import { ChatModule } from './chat/chat.module';
-import { MessageService } from './message/message.service';
+import { MessagesService } from './message/messages.service';
+import { MessagesModule } from './message/messages.module';
+
 
 @Module({
   imports: [
@@ -80,11 +82,11 @@ import { MessageService } from './message/message.service';
     CaslModule,
     GatewayModule,
     ChatModule,
+    MessagesModule
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    MessageService,
   ],
 })
 export class AppModule { }

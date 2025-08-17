@@ -3,7 +3,7 @@ import { Socket } from 'socket.io';
 import { Server } from 'socket.io';
 
 
-@WebSocketGateway(3002, {})
+@WebSocketGateway(3002, { cors: true })
 export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @WebSocketServer() server: Server;
@@ -27,5 +27,10 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('newMessage')
     handleEvent(client: Socket, message: any) {
         this.server.emit('message', message)
+    }
+
+    @SubscribeMessage('newNMsg')
+    sendMessage() {
+        this.server.emit('newMsg', 'Hello world from the server')
     }
 }
