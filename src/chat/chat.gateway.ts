@@ -8,6 +8,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { MessagesService } from 'src/message/messages.service';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
+import { UseGuards } from '@nestjs/common';
+import { WsGuard } from 'src/auth/ws/ws.guard';
 
 @WebSocketGateway(3002, { cors: true })
 export class ChatGateway {
@@ -37,6 +39,7 @@ export class ChatGateway {
   }
 
   // Send message
+  @UseGuards(WsGuard)
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
