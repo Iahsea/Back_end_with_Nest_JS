@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, HydratedDocument } from 'mongoose';
+import mongoose, { Document, HydratedDocument } from 'mongoose';
+import { User } from 'src/users/schemas/user.schema';
 
 export type MessageDocument = HydratedDocument<Message>;
 
@@ -8,8 +9,8 @@ export class Message extends Document {
     @Prop({ required: true })
     conversationId: string;   // ID của cuộc trò chuyện (1-1 hoặc group)
 
-    @Prop({ required: true })
-    authorId: string;         // Ai gửi tin nhắn
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name, required: true })
+    authorId: mongoose.Schema.Types.ObjectId;
 
     @Prop({ required: true })
     message: string;          // Nội dung tin nhắn

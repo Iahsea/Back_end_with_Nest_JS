@@ -1,23 +1,22 @@
-import { CanActivate, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { UsersService } from 'src/users/users.service';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { WsException } from '@nestjs/websockets';
+import { CanActivate, Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+import { WsException } from "@nestjs/websockets";
+import { UsersService } from "src/users/users.service";
 
 @Injectable()
 export class WsGuard implements CanActivate {
-
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-  ) {
-  }
+  ) { }
 
   async canActivate(context: any): Promise<boolean> {
     try {
-      const authHeader = context.args[0].handshake.headers.authorization;
+      const client = context.switchToWs().getClient(); // <-- lấy socket client
+      const authHeader = client.handshake.headers.authorization;
+
       if (!authHeader) {
         throw new WsException('Unauthorized: No token provided');
       }
@@ -38,8 +37,8 @@ export class WsGuard implements CanActivate {
         throw new WsException('Unauthorized: User not found');
       }
 
-      // gán user vào client để sau dùng trong handler
-      context.args[0].user = user;
+      // gán user chuẩn NestJS/socket.io
+      client.data.user = user;
 
       return true;
     } catch (ex) {

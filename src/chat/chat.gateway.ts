@@ -45,9 +45,12 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @MessageBody() createMessageDto: CreateMessageDto
   ) {
+
+    const user = client.data.user;
+
     console.log(client.rooms);
     // 1. Lưu vào DB
-    const savedMessage = await this.messageService.create(createMessageDto);
+    const savedMessage = await this.messageService.create(createMessageDto, user);
 
     // 2. Emit message cho tất cả user trong room conversationId
     this.server.to(createMessageDto.conversationId).emit('msg', savedMessage);

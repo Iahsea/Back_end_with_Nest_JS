@@ -10,13 +10,6 @@ export class CreateMessageDto {
     conversationId: string;
 
     @ApiProperty({
-        description: "ID của người gửi tin nhắn",
-        example: "user_123"
-    })
-    @IsNotEmpty({ message: 'authorId không được để trống' })
-    authorId: string;
-
-    @ApiProperty({
         description: "Nội dung tin nhắn",
         example: "Xin chào, bạn có thể hỗ trợ mình không?"
     })

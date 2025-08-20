@@ -4,10 +4,14 @@ import { Message, MessageSchema } from './schemas/message.schema';
 import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
 import { ChatModule } from 'src/chat/chat.module';
+import { Conversation, ConversationSchema } from 'src/conversations/schemas/conversations.schema';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
+        MongooseModule.forFeature([
+            { name: Message.name, schema: MessageSchema },
+            { name: Conversation.name, schema: ConversationSchema }
+        ]),
         forwardRef(() => ChatModule)
     ],
     controllers: [MessagesController],
