@@ -31,6 +31,16 @@ export class JobsController {
     return this.jobsService.findOne(id);
   }
 
+  @Public()
+  @ResponseMessage("Fetch jobs by company id")
+  @Get('company/:id')
+  findByCompany(
+    @Param('id') companyId: string,
+    @Query() queryString: any
+  ) {
+    return this.jobsService.findByCompany(companyId, queryString);
+  }
+
   @ResponseMessage("Update a job")
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateJobDto: UpdateJobDto, @User() user: IUser) {

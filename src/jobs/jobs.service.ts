@@ -17,7 +17,7 @@ export class JobsService {
 
   async create(createJobDto: CreateJobDto, user: IUser) {
     const { name, skills, company, salary, quantity, level,
-      description, startDate, endDate, isActive, location } = createJobDto;
+      description, startDate, endDate, isActive, location, logoJob } = createJobDto;
 
     let newJob = await this.jobModel.create({
       name,
@@ -31,6 +31,7 @@ export class JobsService {
       endDate,
       isActive,
       location,
+      logoJob,
       createdBy: {
         _id: user._id,
         email: user.email
@@ -79,6 +80,47 @@ export class JobsService {
       throw new BadRequestException("not found job")
 
     return await this.jobModel.findById(id)
+  }
+
+  async findByCompany(companyId: string, query: any) {
+    if (!mongoose.Types.ObjectId.isValid(companyId))
+      throw new BadRequestException("not found company")
+
+    const { filter, sort, populates } = buildQueryParams(query);
+
+    // ép thêm điều kiện lọc theo company._id
+    const finalFilter = {
+      ...filter,
+      "company._id": companyId
+    };
+
+    const page = parseInt(query.current);
+    const limit = parseInt(query.pageSize);
+
+    const offset = (page - 1) * limit;
+
+    let defaultLimit = +limit ? +limit : 10
+
+    const totalItems = (await this.jobModel.find(finalFilter)).length
+    const totalPages = Math.ceil(totalItems / defaultLimit)
+
+    const result = await this.jobModel
+      .find(finalFilter)
+      .skip(offset)
+      .limit(limit)
+      .sort(sort)
+      // .populate(populates)
+      .exec();
+
+    return {
+      meta: {
+        currentPage: page,
+        pageSize: limit,
+        totalPages: totalPages,
+        totalItems: totalItems
+      },
+      result
+    }
   }
 
   async update(_id: string, updateJobDto: UpdateJobDto, user: IUser) {

@@ -5,12 +5,11 @@ import { IUser } from 'src/users/users.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { CreateUserDto, RegisterUserDto, UserLoginFacebookDto, UserLoginGoogleDto } from 'src/users/dto/create-user.dto';
+import { RegisterUserDto, UserLoginFacebookDto, UserLoginGoogleDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
-import { response, Response } from 'express';
+import { Response } from 'express';
 import ms, { StringValue } from 'ms';
 import { RolesService } from 'src/roles/roles.service';
-import { permission } from 'process';
 import { Role, RoleDocument } from 'src/roles/schemas/role.schema';
 import { USER_ROLE } from 'src/databases/sample';
 
@@ -45,14 +44,15 @@ export class AuthService {
     }
 
     async login(user: IUser, response: Response) {
-        const { _id, name, email, role, permissions } = user;
+        const { _id, name, email, role, permissions, avatarUrl } = user;
         const payload = {
             sub: "token login",
             iss: "from server",
             _id,
             name,
             email,
-            role
+            role,
+            avatarUrl
         };
 
         const refresh_token = this.createRefreshToken(payload)
@@ -74,6 +74,7 @@ export class AuthService {
                 email,
                 role,
                 permissions,
+                avatarUrl
             }
         };
     }
@@ -165,7 +166,7 @@ export class AuthService {
 
         const newUserRole = await this.roleModel.findOne({ name: USER_ROLE });
         // check theo google id
-        let user = await this.userModel.findOne({ googleId: googleUser.googleId })
+        let user = await this.userModel.findOne({ googleId: googleUser.googleId }).populate("role", "_id name");
 
         if (!user) {
             user = await this.userModel.create({

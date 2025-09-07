@@ -33,6 +33,10 @@ export class CreateJobDto {
     location: string;
 
     @ApiProperty()
+    @IsNotEmpty({ message: 'LogoJob không được để trống', })
+    logoJob: string;
+
+    @ApiProperty()
     @IsNotEmpty({ message: 'Salary không được để trống', })
     salary: number;
 

@@ -3,7 +3,9 @@ import {
   SubscribeMessage,
   WebSocketServer,
   MessageBody,
-  ConnectedSocket
+  ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { MessagesService } from 'src/message/messages.service';
@@ -12,11 +14,27 @@ import { UseGuards } from '@nestjs/common';
 import { WsGuard } from 'src/auth/ws/ws.guard';
 
 @WebSocketGateway(3002, { cors: true })
-export class ChatGateway {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly messageService: MessagesService) { }
 
   @WebSocketServer()
   server: Server;
+
+  handleConnection(client: Socket) {
+    console.log('New user connected...', client.id);
+
+    this.server.emit('user-joined', {
+      message: `New User Joined the chat: ${client.id}`,
+    })
+  }
+
+  handleDisconnect(client: Socket) {
+    console.log('User disconnected...', client.id);
+
+    this.server.emit('user-left', {
+      message: `User Left the chat: ${client.id}`,
+    })
+  }
 
   // Join room
   @SubscribeMessage('joinRoom')

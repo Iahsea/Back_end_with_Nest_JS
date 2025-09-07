@@ -46,6 +46,7 @@ export class AuthController {
     @Get('account')
     @ResponseMessage("Get user information")
     async getProfile(@User() user: IUser) {
+        console.log(user);
         const temp = await this.rolesService.findOne(user.role._id) as any
         user.permissions = temp.permissions;
         return { user };
@@ -86,9 +87,9 @@ export class AuthController {
         @Req() req,
         @Res() response: Response
     ) {
-        const tokens = await this.authService.login(req, response)
+        const tokens = await this.authService.login(req.user, response)
         // redirect về front-end kèm token
-        return response.redirect(`http://localhost:3000?token=${tokens.access_token}`)
+        return response.redirect(`http://localhost:4200/login-success?token=${tokens.access_token}`)
     }
 
 
@@ -108,6 +109,6 @@ export class AuthController {
     ): Promise<any> {
         const tokens = await this.authService.login(req, response)
         // redirect về front-end kèm token
-        return response.redirect(`http://localhost:3000?token=${tokens.access_token}`)
+        return response.redirect(`http://localhost:4200/login-success?token=${tokens.access_token}`)
     }
 }

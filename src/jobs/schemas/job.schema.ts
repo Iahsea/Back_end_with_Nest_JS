@@ -23,6 +23,9 @@ export class Job {
     location: string;
 
     @Prop()
+    logoJob: string;
+
+    @Prop()
     salary: number;
 
     @Prop()
